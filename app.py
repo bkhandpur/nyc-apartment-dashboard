@@ -43,8 +43,9 @@ else:
         return 2                                                 
 
     if not filtered_df.empty:
-        if "Move-in Date" in filtered_df.columns:
-            filtered_df["_sort_key"] = filtered_df["Move-in Date"].apply(assign_sort_priority)
+        # POINTED SORT ENGINE TO NEW COLUMN NAME
+        if "Move-in Options" in filtered_df.columns:
+            filtered_df["_sort_key"] = filtered_df["Move-in Options"].apply(assign_sort_priority)
             filtered_df = filtered_df.sort_values(by=["_sort_key", "Pipeline Score"], ascending=[True, False])
         elif "Pipeline Score" in filtered_df.columns:
             filtered_df = filtered_df.sort_values(by="Pipeline Score", ascending=False)
@@ -58,7 +59,7 @@ else:
     else:
         col3.metric("Avg Score (Filtered)", "0")
     
-    # 🗺️ INTERACTIVE PLOTLY MAP HOVER SYSTEM (UPGRADED UI)
+    # 🗺️ INTERACTIVE PLOTLY MAP HOVER SYSTEM
     if "Latitude" in filtered_df.columns and "Longitude" in filtered_df.columns:
         valid_coords = filtered_df[filtered_df["Latitude"].notna() & filtered_df["Longitude"].notna()]
         if not valid_coords.empty:
@@ -67,7 +68,7 @@ else:
             hover_dict = {"Latitude": False, "Longitude": False}
             if "Price" in valid_coords.columns: hover_dict["Price"] = ":$%d"
             if "Pipeline Score" in valid_coords.columns: hover_dict["Pipeline Score"] = True
-            if "Move-in Date" in valid_coords.columns: hover_dict["Move-in Date"] = True
+            if "Move-in Options" in valid_coords.columns: hover_dict["Move-in Options"] = True
             if "Commute to School" in valid_coords.columns: hover_dict["Commute to School"] = True
 
             fig = px.scatter_mapbox(
@@ -90,9 +91,11 @@ else:
             )
             st.plotly_chart(fig, use_container_width=True)
         
-    # Reorganize Columns for Table View
+    # Reorganize Columns for Table View (UPDATED VIP LIST)
     ideal_columns = [
-        "Address", "Price", "Move-in Date", "Days On Market", "Pipeline Score", "Risk Assessment Summary", 
+        "Address", "Price", "Move-in Options", "Corporate / Reputable Backing", 
+        "Doorman / Attended Lobby", "Furnished Status", "Days On Market", 
+        "Pipeline Score", "Risk Assessment Summary", 
         "Year Built", "Lease Term", "Utilities", "Features & Amenities",
         "Commute to Uncle", "Commute to School", 
         "Class A (Minor)", "Class B (Hazard)", "Class C (Emergency)", 
@@ -116,6 +119,4 @@ else:
     )
     
     st.sidebar.divider()
-    st.sidebar.info("💡 Run `python3 hunter.py` in the terminal to pull new data, then click Refresh.")
-    if st.sidebar.button("🔄 Refresh Latest Data"):
-        st.rerun()
+    st.sidebar.info("💡 Run `python3 hunter.py` in the terminal to pull new data, then update GitHub to refresh.")
